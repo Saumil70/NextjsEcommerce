@@ -1,9 +1,11 @@
 import Layout from "../layouts/Main";
 import Link from "next/link";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { server } from "../utils/server";
-import { postData } from "../utils/services";
+import { useRouter } from "next/router";
+import { useSelector, useDispatch } from "react-redux";
+import { login } from "../store/reducers/userReducer";
 
+import axios from "axios";
 type FormValues = {
   email: string;
   password: string;
@@ -11,6 +13,10 @@ type FormValues = {
 };
 
 const LoginPage = () => {
+  const isLoggedin = useSelector((state: any) => state.isloggedin.isLoggedin);
+  console.log(isLoggedin, "Before login");
+  const router = useRouter();
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
@@ -19,12 +25,26 @@ const LoginPage = () => {
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     console.log(data);
-    const res = await postData(`${server}/api/login`, {
-      email: data.email,
-      password: data.password,
-    });
-
-    console.log(res);
+    try {
+      const response = await axios.post(
+        `https://localhost:7207/api/Users/Login?email=${data.email}&password=${data.password}`
+      );
+      if (response.status === 200) {
+        sessionStorage.setItem("token", JSON.stringify(response.data));
+        dispatch(login());
+        console.log(isLoggedin, "After login");
+        router.push("/");
+        console.log(response.data, "Login successfully");
+      } else {
+        console.log(response.data, "cannot Login");
+      }
+    } catch (error: any) {
+      // alert(error.response.data.Credentials);
+      if (error.response.data.Credentials[0]) {
+        alert(error.response.data.Credentials[0]);
+      }
+      console.log(error.response, "Login error");
+    }
   };
 
   return (
@@ -39,11 +59,7 @@ const LoginPage = () => {
 
           <div className="form-block">
             <h2 className="form-block__title">Log in</h2>
-            <p className="form-block__description">
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s
-            </p>
+            <p className="form-block__description"></p>
 
             <form className="form" onSubmit={handleSubmit(onSubmit as any)}>
               <div className="form__input-row">
@@ -85,7 +101,7 @@ const LoginPage = () => {
                 )}
               </div>
 
-              <div className="form__info">
+              {/* <div className="form__info">
                 <div className="checkbox-wrapper">
                   <label
                     htmlFor="check-signed-in"
@@ -115,7 +131,7 @@ const LoginPage = () => {
                 <button type="button" className="btn-social google-btn">
                   <img src="/images/icons/gmail.svg" alt="gmail" /> Gmail
                 </button>
-              </div>
+              </div> */}
 
               <button
                 type="submit"
@@ -125,7 +141,7 @@ const LoginPage = () => {
               </button>
 
               <p className="form__signup-link">
-                Not a member yet? <a href="/register">Sign up</a>
+                Not a member yet? <Link href="/register">Sign up</Link>
               </p>
             </form>
           </div>

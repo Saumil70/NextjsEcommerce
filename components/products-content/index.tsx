@@ -28,8 +28,7 @@ const ProductsContent = () => {
           </div>
         </form>
       </div>
-
-      <List />
+      <List/>
     </section>
   );
 };

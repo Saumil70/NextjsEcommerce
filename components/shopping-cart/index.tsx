@@ -1,10 +1,12 @@
-import { useSelector } from 'react-redux';
 import CheckoutStatus from '../../components/checkout-status';
 import Item from './item';
 import { RootState } from 'store';
+import { useSelector } from "react-redux";
+import Link from 'next/link';
 
 const ShoppingCart = () => {
   const { cartItems } = useSelector((state: RootState)  => state.cart);
+  const isLoggedIn = useSelector((state: RootState) => state.isloggedin.isLoggedin);
 
   const priceTotal = () => {
     let totalPrice = 0;
@@ -38,10 +40,10 @@ const ShoppingCart = () => {
 
                 {cartItems.map(item => (
                   <Item 
-                    key={item.id}
-                    id={item.id}
+                    key={item.productId}
+                    productId={item.productId}
                     thumb={item.thumb}
-                    name={item.name}
+                    productName={item.productName}
                     color={item.color}
                     price={item.price}
                     size={item.size}
@@ -63,13 +65,11 @@ const ShoppingCart = () => {
 
           <div className="cart-actions__items-wrapper">
             <p className="cart-actions__total">Total cost <strong>${priceTotal().toFixed(2)}</strong></p>
-            <a href="/cart/checkout" className="btn btn--rounded btn--yellow">Checkout</a>
+            <Link href={isLoggedIn? "/cart/checkout" : "/login" } className="btn btn--rounded btn--yellow">Checkout</Link>
           </div>
         </div>
       </div>
     </section>
   )
 };
-
-  
 export default ShoppingCart

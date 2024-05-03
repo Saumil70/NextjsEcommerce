@@ -1,36 +1,54 @@
-import useSwr from 'swr';
-import ProductItem from '../../product-item';
-import ProductsLoading from './loading';
-import { ProductTypeList } from 'types';
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import ProductItem from "../../product-item";
+import ProductsLoading from "./loading";
+import { ProductFetch, ProductTypeList } from "types";
 
-const ProductsContent = () => {
-  const fetcher = (url: string) => fetch(url).then((res) => res.json());
-  const { data, error } = useSwr('/api/products', fetcher);
+const ProductsContent: React.FC = () => {
+  // Correct the useState declaration
+  const [data, setData] = useState<ProductFetch[]>([]);
+  const [isLoading, setIsLoading] = useState(true); // State for loading indication
 
-  if (error) return <div>Failed to load users</div>;
+  // Define the function to fetch products
+  const getProducts = async () => {
+    try {
+      setIsLoading(true); // Set loading state to true
+      const response = await axios.get("https://localhost:7207/api/Users/GetProducts");
+      setData(response.data); // Set state with fetched data
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    } finally {
+      setIsLoading(false); // Loading is complete
+    }
+  };
+
+  // Fetch products when component mounts
+  useEffect(() => {
+    getProducts(); // Call function to fetch data
+  }, []); // Empty dependency array to ensure it runs once on mount
+
   return (
     <>
-      {!data && 
-        <ProductsLoading />
-      }
-
-      {data &&
+      {isLoading ? (
+        <ProductsLoading /> // Show loading component while loading
+      ) : (
         <section className="products-list">
-          {data.map((item: ProductTypeList)  => (
-            <ProductItem 
-              id={item.id} 
-              name={item.name}
+          {data.map((item) => (
+            <ProductItem
+              key={item.productId} // Use a unique key
+              id={item.productId}
+              name={item.productName}
               price={item.price}
               color={item.color}
               currentPrice={item.currentPrice}
-              key={item.id}
-              images={item.images} 
+              imageData={item.imageData}
             />
           ))}
         </section>
-      }
+      )}
     </>
   );
 };
-  
-export default ProductsContent
+
+export default ProductsContent;

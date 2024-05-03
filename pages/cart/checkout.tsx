@@ -14,7 +14,6 @@ const CheckoutPage = () => {
     if (cartItems.length > 0) {
       cartItems.map((item) => (totalPrice += item.price * item.count));
     }
-
     return totalPrice;
   });
 
@@ -29,7 +28,7 @@ const CheckoutPage = () => {
 
           <div className="checkout-content">
             <div className="checkout__col-6">
-              <div className="checkout__btns">
+              {/* <div className="checkout__btns">
                 <button
                   className="btn btn--rounded btn--yellow"
                   onClick={() => router.push("/login")}
@@ -42,7 +41,7 @@ const CheckoutPage = () => {
                 >
                   Sign up
                 </button>
-              </div>
+              </div> */}
 
               <div className="block">
                 <h3 className="block__title">Shipping information</h3>
@@ -95,8 +94,10 @@ const CheckoutPage = () => {
                     <div className="form__col">
                       <input
                         className="form__input form__input--sm"
-                        type="text"
+                        type="number"
                         placeholder="Postal code / ZIP"
+                        minLength={6}
+                        maxLength={6}
                       />
                     </div>
                   </div>
@@ -105,7 +106,7 @@ const CheckoutPage = () => {
                     <div className="form__col">
                       <input
                         className="form__input form__input--sm"
-                        type="text"
+                        type="number"
                         placeholder="Phone number"
                       />
                     </div>

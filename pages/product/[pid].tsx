@@ -1,5 +1,4 @@
 import { GetServerSideProps } from 'next'
-
 import { useState } from 'react';
 import Footer from '../../components/footer';
 import Layout from '../../layouts/Main';
@@ -10,9 +9,12 @@ import Content from '../../components/product-single/content';
 import Description from '../../components/product-single/description';
 import Reviews from '../../components/product-single/reviews';
 import { server } from '../../utils/server'; 
+import { useSelector, useDispatch } from "react-redux";
+import { login, logout } from "store/reducers/userReducer";
 
 // types
 import { ProductType } from 'types';
+import axios from 'axios';
 
 type ProductPageType = {
   product: ProductType;
@@ -20,8 +22,10 @@ type ProductPageType = {
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const pid = query.pid;
-  const res = await fetch(`${server}/api/product/${pid}`);
-  const product = await res.json();
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; 
+  const res = await axios.get(`https://localhost:7207/api/Users/GetProductById/${pid}`);
+  const product = await res.data;
+  console.log(product);
 
   return {
     props: {
@@ -40,7 +44,7 @@ const Product = ({ product }: ProductPageType) => {
       <section className="product-single">
         <div className="container">
           <div className="product-single__content">
-            <Gallery images={product.images} />
+            <Gallery images={product.imageData} />
             <Content product={product} />
           </div>
 
@@ -63,5 +67,4 @@ const Product = ({ product }: ProductPageType) => {
     </Layout>
   );
 }
-
-export default Product
+export default Product;

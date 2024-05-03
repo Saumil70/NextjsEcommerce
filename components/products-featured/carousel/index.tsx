@@ -1,5 +1,5 @@
 import ProductItem from "./../../product-item";
-import { ProductTypeList } from "types";
+import { ProductFetch, ProductTypeList } from "types";
 
 // import Swiper core and required components
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -53,13 +53,13 @@ const ProductsCarousel = ({ products }: ProductsCarouselType) => {
           <SwiperSlide key={item.id}>
             <ProductItem
               id={item.id}
-              name={item.name}
+              name={item.id}
               price={item.price}
               color={item.color}
               discount={item.discount}
               currentPrice={item.currentPrice}
               key={item.id}
-              images={item.images}
+              imageData={item.imageData}
             />
           </SwiperSlide>
         ))}

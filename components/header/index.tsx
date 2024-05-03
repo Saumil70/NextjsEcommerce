@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useContext } from "react";
-import { useSelector } from "react-redux";
 import useOnClickOutside from "use-onclickoutside";
 import Logo from "../../assets/icons/logo";
 import Link from "next/link";
@@ -7,6 +6,8 @@ import { useRouter } from "next/router";
 import { RootState } from "store";
 import { DarkModeSwitch } from "react-toggle-dark-mode";
 import { ThemeContext } from "components/context/theme-context";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "store/reducers/userReducer";
 
 type HeaderType = {
   isErrorPage?: Boolean;
@@ -14,9 +15,9 @@ type HeaderType = {
 
 const Header = ({ isErrorPage }: HeaderType) => {
   const router = useRouter();
+  const dispatch = useDispatch();
   const { cartItems } = useSelector((state: RootState) => state.cart);
   const arrayPaths = ["/"];
-
   const [onTop, setOnTop] = useState(
     !arrayPaths.includes(router.pathname) || isErrorPage ? false : true
   );
@@ -24,9 +25,11 @@ const Header = ({ isErrorPage }: HeaderType) => {
   const [searchOpen, setSearchOpen] = useState(false);
   const navRef = useRef(null);
   const searchRef = useRef(null);
-
   const { theme, toggleTheme } = useContext(ThemeContext);
-
+  const isLoggedIn = useSelector((state: RootState) => state.isloggedin.isLoggedin);
+  if (isLoggedIn) {
+    console.log("IS header Logged in", isLoggedIn);
+  }
   const headerClass = () => {
     if (window.pageYOffset === 0) {
       setOnTop(true);
@@ -54,6 +57,11 @@ const Header = ({ isErrorPage }: HeaderType) => {
     setSearchOpen(false);
   };
 
+  const handleLogout = () => {
+    sessionStorage.removeItem("token");
+    dispatch(logout());
+    router.push("/login");
+  };
   // on click outside
   useOnClickOutside(navRef, closeMenu);
   useOnClickOutside(searchRef, closeSearch);
@@ -64,7 +72,7 @@ const Header = ({ isErrorPage }: HeaderType) => {
         <Link href="/">
           <h1 className="site-logo">
             <Logo />
-            E-Shop
+            Lari
           </h1>
         </Link>
         <nav
@@ -118,11 +126,18 @@ const Header = ({ isErrorPage }: HeaderType) => {
               )}
             </button>
           </Link>
-          <Link href="/login" legacyBehavior>
-            <button className="site-header__btn-avatar">
-              <i className="icon-avatar"></i>
+          {isLoggedIn ? (
+            <button className="site-nav__btn" onClick={handleLogout}>
+              <i className="icon-log-in"></i>
+              <p>Logout</p>
             </button>
-          </Link>
+          ) : (
+            <Link href="/login">
+              <button className="site-nav__btn">
+                <b>Login</b>
+              </button>
+            </Link>
+          )}
           <button
             onClick={() => setMenuOpen(true)}
             className="site-header__btn-menu"
@@ -136,5 +151,4 @@ const Header = ({ isErrorPage }: HeaderType) => {
     </header>
   );
 };
-
 export default Header;

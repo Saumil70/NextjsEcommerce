@@ -1,9 +1,11 @@
+import axios from 'axios';
 import ProductsCarousel from './carousel';
 import useSwr from 'swr';
 
 const ProductsFeatured = () => {
-  const fetcher = (url: string) => fetch(url).then((res) => res.json());
-  const { data } = useSwr('/api/products', fetcher);
+  const fetcher = (url: string) => axios.get(url).then((res) => res.data);
+  const {data}  = useSwr("https://localhost:7207/api/Users/GetProducts",fetcher);
+  console.log(data);
 
   return (
     <section className="section section-products-featured">
